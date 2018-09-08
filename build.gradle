@@ -1,0 +1,93 @@
+
+buildscript{
+	ext{
+		springBootVersion="2.0.4.RELEASE"
+		releaseVersion="1.0"
+	}
+	repositories{
+		maven{url "http://plugin.gradle.org/m2/"}
+		maven{url "http:repo.string.io/plugins-release"}
+		jcenter()
+		mavenCentral()
+	}
+	dependencies{
+		classpath{"org.springframework.build.gradle:propdeps-plugin:0.0.7"}
+		classpath{"io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"}
+		classpath{"org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"}
+		classpath{"org.ajoberstar:grgit:1.1.0"}
+		classpath{"com.commercehub:gradle-cucumber-jvm-plugin:0.8"}
+	}
+
+}
+plugin{
+	id "java"
+	id "groovy"
+	id "eclipse"
+	id 'org.hidetake.swagger.generator' version '2.9.0'
+	id "jacoco"
+	id 'com.commercehub.cucumber-jvm' version '0.8'
+}
+apply plugin: "io.spring.dependency-management"
+apply plugin: "org.springframework.boot"
+apply plugin: "jacoco"
+apply plugin: "cucumber-jvm"
+apply plugin: "maven-publish"
+apply plugin: "groovy"
+
+group ''
+version = releaseVersion
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(javaCompile) {options.encoding = 'UTF-8'}
+
+compileJava {
+	dependson processResources
+}
+
+apply plugin: 'war'
+
+war{
+	archieveName = 'Generator-' + version + '.war'
+}
+
+sourceSets{
+	main{
+	
+	}
+}
+
+//-----------Test Config Setting Area--------
+
+bootRepackage{
+	enable = false
+}
+
+dependencies{
+ 	compile 'io.swagger:swagger-annotations:1.5.10'
+ 	
+ 	compile(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.8.RELEASE' ){ exclude(module: 'tomcat-embed-el' ) }
+ 	compile(group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version:'1.5.8.RELEASE' ){ exclude(module: 'tomcat-embed-el' ) }
+ 	compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version:'2.7.0'
+ 	compile group: 'cglib', name: 'cglib-nodep', version:'3.2.5'
+ 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version:'1.5.8RELEASE'
+ 	compile group: 'javax', name: 'javaee-web-api', version:'8.0'
+ 	compile 'org.apache.poi:poi-ooxml:3.9'
+ 	
+	testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.8.RELEASE'){exclude(module: 'commons-logging' )}
+	testCompile(group: 'org.spockframework', name: 'spock-core', version:'1.1-groovy-2.4'){exclude(module: 'groovy-all' )}
+	testCompile(
+		'junit:junut:4.12',
+		'org.codehaus.groovy:groovy-all:2.4.9',
+		'info.cukes:cucumber-java:1.2.5',
+		'info.cukes:cucumber-junit:1.2.5',
+		'org.glassfish.jersey.media:jersy-media-json-jackson:2.14',
+		'org.glassfish:javax.json:1.0.4',
+		'javax.json:javax.json-api:1.0'
+	)
+
+	repositories{
+		maven {url "http://plugins.gradle.org/m2/"}
+		maven {url "http://repo.spring.io/plugins-release"}
+	}
+}
